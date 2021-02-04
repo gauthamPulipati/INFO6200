@@ -9,6 +9,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+import edu.neu.coe.info6205.sort.Helper;
+import edu.neu.coe.info6205.sort.simple.*;
+import java.util.Random;
+
 import static edu.neu.coe.info6205.util.Utilities.formatWhole;
 
 /**
@@ -118,11 +122,75 @@ public class Benchmark_Timer<T> implements Benchmark<T> {
     public Benchmark_Timer(String description, Consumer<T> f) {
         this(description, null, f, null);
     }
+    
+    public Supplier<T> Supp(Supplier <T> SS){
+    	return SS;
+    }
 
     private final String description;
     private final UnaryOperator<T> fPre;
     private final Consumer<T> fRun;
     private final Consumer<T> fPost;
+    
+    public static void main(String[] args) {
+    	Random random=new Random();
+    	
+    	
+    	int n=1000;
+    	int runs=45;
+    	
+    	for(int i=0;i<6;i++) {
+    		
+    		Integer[] array_random=new Integer[n];
+    		Integer[] array_sorted=new Integer[n];
+    		Integer[] array_partial=new Integer[n];
+    		Integer[] array_reverse=new Integer[n];
+    		
+    		array_sorted[0]=random.nextInt();
+    		
+    		for(int j=0;j<n;j++) {
+    			array_random[j]=random.nextInt()/2;
+    			if(j!=0) {
+    				array_sorted[j]=array_sorted[j-1]+1+(random.nextInt()/10);
+    			}
+    			if(j%3!=0) {
+    				array_partial[j]=array_sorted[j];
+    			}
+    			else {
+    				array_partial[j]=array_random[j];
+    			}
+    			array_reverse[n-j-1]=array_sorted[j];
+    		}
+    		
+    		InsertionSort isr=new InsertionSort();
+    		Benchmark_Timer<Integer[]> timer_r = new Benchmark_Timer<>("Benchmarking", null,(x) -> isr.sort(x,0,x.length),null);
+    		
+    		Supplier sup_random=() -> array_random;
+    		Supplier sup_sorted=() -> array_sorted;
+    		Supplier sup_partial=() -> array_partial;
+    		Supplier sup_reverse=() -> array_reverse;
+    		
+    		double time_random= timer_r.runFromSupplier(sup_random, runs);
+    		System.out.println("When n is "+n+" mean time is "+time_random+" for a random array");
+    		System.out.println();
+    		
+    		double time_sorted= timer_r.runFromSupplier(sup_sorted, runs);
+    		System.out.println("When n is "+n+" mean time is "+time_sorted+" for a sorted array");
+    		System.out.println();
+    		
+    		double time_partial= timer_r.runFromSupplier(sup_partial, runs);
+    		System.out.println("When n is "+n+" mean time is "+time_partial+" for a partial array");
+    		System.out.println();
+    		
+    		double time_reverse= timer_r.runFromSupplier(sup_reverse, runs);
+    		System.out.println("When n is "+n+" mean time is "+time_reverse+" for a reversed array");
+    		System.out.println();
+    		
+    		//System.out.println(array_sorted[0]+"     --    "+array_reverse[0]);
+    		
+    		n=n*2;
+    	}
+    }
 
     final static LazyLogger logger = new LazyLogger(Benchmark_Timer.class);
 }
