@@ -58,6 +58,19 @@ public class WheelOfFortune<T> {
      */
     public T get() {
         // TO BE IMPLEMENTED
+    	int ran=random.nextInt(total);
+    	T ans;
+    	ran=Math.abs(ran);
+    	for(int i=0;i<total;i++) {
+    		if (ran>events[i].frequency) {
+    			ran=ran-events[i].frequency;
+    		}
+    		else {
+    			ans=events[i];
+    			break;
+    		}
+    		
+    	}
         throw new UnsupportedOperationException();
     }
 
